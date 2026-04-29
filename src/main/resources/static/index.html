@@ -30,6 +30,9 @@
   --mono:'JetBrains Mono',monospace;
   --r:12px;
   --shadow:0 2px 16px rgba(26,22,18,0.08);
+  --sidebar-w:260px;
+  --header-h:60px;
+  --bottom-nav-h:64px;
 }
 
 body{
@@ -41,43 +44,66 @@ body{
   flex-direction:column;
 }
 
-/* ── HEADER ── */
+/* ══════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════ */
 header{
   background:var(--ink);
   color:var(--paper);
-  padding:0 32px;
-  height:60px;
+  padding:0 20px;
+  height:var(--header-h);
   display:flex;
   align-items:center;
-  gap:16px;
+  gap:12px;
+  position:sticky;
+  top:0;
+  z-index:100;
+  flex-shrink:0;
 }
 .logo-mark{
   width:32px;height:32px;border-radius:8px;
   background:var(--rust);
   display:flex;align-items:center;justify-content:center;
   font-family:var(--serif);font-size:16px;font-style:italic;color:#fff;
+  flex-shrink:0;
 }
-header h1{font-family:var(--serif);font-size:17px;font-weight:400;letter-spacing:0.02em}
-.header-sub{font-size:12px;color:#9a9082;margin-left:4px}
-.ollama-pill{
+header h1{font-family:var(--serif);font-size:17px;font-weight:400;letter-spacing:0.02em;white-space:nowrap}
+.header-sub{font-size:12px;color:#9a9082;margin-left:2px;display:none}
+.model-pill{
   margin-left:auto;font-size:11px;font-family:var(--mono);
   padding:4px 10px;border-radius:20px;
   background:rgba(255,255,255,0.08);color:#b0a898;
   border:1px solid rgba(255,255,255,0.1);
+  white-space:nowrap;flex-shrink:0;
+}
+/* hamburger for mobile */
+.menu-btn{
+  display:none;
+  background:none;border:none;color:var(--paper);
+  font-size:22px;cursor:pointer;padding:4px;margin-left:auto;
+  line-height:1;
 }
 
-/* ── LAYOUT ── */
-main{display:flex;flex:1;overflow:hidden}
+/* ══════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════ */
+main{display:flex;flex:1;overflow:hidden;position:relative}
 
-/* ── SIDEBAR ── */
+/* ══════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════ */
 aside{
-  width:260px;min-width:260px;
+  width:var(--sidebar-w);
+  min-width:var(--sidebar-w);
   background:var(--cream);
   border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
+  display:flex;
+  flex-direction:column;
   padding:20px 16px;
   gap:6px;
   overflow-y:auto;
+  transition:transform 0.3s ease;
+  z-index:50;
 }
 
 .section-label{
@@ -94,9 +120,7 @@ aside{
   width:100%;text-align:left;transition:all 0.15s;
 }
 .nav-btn:hover{background:var(--warm);color:var(--ink)}
-.nav-btn.active{
-  background:var(--ink);color:var(--paper);
-}
+.nav-btn.active{background:var(--ink);color:var(--paper)}
 .nav-btn .ni{
   width:30px;height:30px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;
@@ -105,15 +129,13 @@ aside{
 }
 .nav-btn:not(.active) .ni{background:var(--warm)}
 
-/* Upload area in sidebar */
+/* Upload area */
 .upload-zone{
   border:2px dashed var(--border);border-radius:var(--r);
   padding:20px;text-align:center;cursor:pointer;
   transition:all 0.2s;margin-top:4px;
 }
-.upload-zone:hover,.upload-zone.drag{
-  border-color:var(--rust);background:var(--rust-lt);
-}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--rust);background:var(--rust-lt)}
 .upload-zone .uz-icon{font-size:28px;display:block;margin-bottom:8px}
 .upload-zone p{font-size:12px;color:var(--muted);line-height:1.5}
 .upload-zone strong{font-size:13px;color:var(--rust);font-weight:600}
@@ -133,22 +155,30 @@ input[type=file]{display:none}
 .sidebar-bottom{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
 .sidebar-bottom p{font-size:11px;color:var(--muted);line-height:1.5;padding:0 4px}
 
-/* ── CONTENT ── */
+/* sidebar overlay for mobile */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.4);z-index:40;
+}
+
+/* ══════════════════════════════════════════
+   CONTENT AREA
+══════════════════════════════════════════ */
 .content-area{
   flex:1;overflow-y:auto;
   display:flex;flex-direction:column;
-  padding:28px 32px;gap:20px;
+  padding:24px 28px;gap:20px;
+  min-width:0;
 }
 
-.panel{display:none;flex-direction:column;gap:20px}
+.panel{display:none;flex-direction:column;gap:18px}
 .panel.active{display:flex}
 
-/* ── PANEL HEADER ── */
-.panel-head{}
-.panel-head h2{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink)}
+/* Panel header */
+.panel-head h2{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink)}
 .panel-head p{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.5}
 
-/* ── INPUT CARD ── */
+/* Input card */
 .input-card{
   background:#fff;border:1px solid var(--border);
   border-radius:var(--r);overflow:hidden;
@@ -176,8 +206,7 @@ textarea{
 .controls-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .count-select{
   padding:6px 10px;border-radius:8px;border:1px solid var(--border);
-  background:#fff;color:var(--ink);font-family:var(--sans);font-size:13px;
-  cursor:pointer;
+  background:#fff;color:var(--ink);font-family:var(--sans);font-size:13px;cursor:pointer;
 }
 label.count-label{font-size:13px;color:var(--muted)}
 
@@ -191,24 +220,18 @@ label.count-label{font-size:13px;color:var(--muted)}
 .btn-primary:hover{background:#b05225}
 .btn-primary:disabled{opacity:0.45;cursor:not-allowed}
 .btn-sm{padding:6px 14px;font-size:12px}
-.btn-outline{
-  background:transparent;border:1px solid var(--border);
-  color:var(--muted);
-}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
 .btn-outline:hover{border-color:var(--ink);color:var(--ink)}
-
 .ml-auto{margin-left:auto}
 
-/* ── RESULT CARD ── */
+/* Result card */
 .result-card{
   background:#fff;border:1px solid var(--border);
-  border-radius:var(--r);box-shadow:var(--shadow);
-  overflow:hidden;
+  border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;
 }
 .result-header{
   padding:12px 16px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;
-  background:var(--cream);
+  display:flex;align-items:center;gap:10px;background:var(--cream);flex-wrap:wrap;
 }
 .type-pill{
   font-size:10px;font-family:var(--mono);font-weight:500;
@@ -218,7 +241,6 @@ label.count-label{font-size:13px;color:var(--muted)}
 .pill-questions{background:var(--blue-lt);color:var(--blue);border:1px solid #b8d0e8}
 .pill-explain{background:var(--gold-lt);color:var(--gold);border:1px solid #e0d0a0}
 .pill-flash{background:var(--rust-lt);color:var(--rust);border:1px solid #e8c8b8}
-
 .result-meta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-left:auto}
 
 .result-body{
@@ -232,91 +254,177 @@ label.count-label{font-size:13px;color:var(--muted)}
 .result-body h1,.result-body h2,.result-body h3{
   font-family:var(--serif);font-weight:600;margin:14px 0 6px;color:var(--ink)
 }
+.result-body h1{font-size:20px}.result-body h2{font-size:17px}.result-body h3{font-size:15px}
+.result-body code{font-family:var(--mono);font-size:12px;background:var(--warm);padding:1px 5px;border-radius:4px}
+.result-body pre{background:var(--warm);border-radius:8px;padding:12px;overflow-x:auto;margin:8px 0}
+.result-body pre code{background:none;padding:0}
 .result-body.empty{
   display:flex;align-items:center;justify-content:center;
-  min-height:160px;color:var(--muted);font-style:italic;font-size:13px;
+  min-height:160px;color:var(--muted);font-style:italic;font-size:13px;text-align:center;
 }
 
-/* ── LOADING ── */
+/* Loading */
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
-.loader{
-  display:flex;align-items:center;gap:6px;
-  padding:20px;color:var(--muted);font-size:13px;
-}
-.dot{
-  width:7px;height:7px;border-radius:50%;background:var(--rust);
-  animation:blink 1.2s ease-in-out infinite;
-}
+.loader{display:flex;align-items:center;gap:6px;padding:20px;color:var(--muted);font-size:13px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--rust);animation:blink 1.2s ease-in-out infinite}
 .dot:nth-child(2){animation-delay:.2s}
 .dot:nth-child(3){animation-delay:.4s}
 
-/* ── FLASHCARDS ── */
-.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:20px}
-.fc{
-  border:1px solid var(--border);border-radius:var(--r);
-  overflow:hidden;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;
-}
+/* Flashcards */
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;padding:20px}
+.fc{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s}
 .fc:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.fc-front{
-  padding:16px;background:var(--cream);
-  font-weight:600;font-size:14px;line-height:1.4;color:var(--ink);
-}
-.fc-back{
-  padding:14px 16px;background:#fff;
-  font-size:13px;line-height:1.6;color:var(--muted);
-  border-top:1px solid var(--border);
-  display:none;
-}
+.fc-front{padding:16px;background:var(--cream);font-weight:600;font-size:14px;line-height:1.4;color:var(--ink)}
+.fc-back{padding:14px 16px;background:#fff;font-size:13px;line-height:1.6;color:var(--muted);border-top:1px solid var(--border);display:none}
 .fc.open .fc-back{display:block}
 .fc.open .fc-front{color:var(--rust)}
 .fc-hint{font-size:10px;color:var(--rust);margin-top:8px;font-family:var(--mono)}
+.fc-controls{display:flex;align-items:center;gap:10px;padding:0 20px 16px}
 
-.fc-controls{
-  display:flex;align-items:center;gap:10px;
-  padding:0 20px 16px;
-}
+/* No content */
+.no-content{background:var(--rust-lt);border:1px solid #e8c8b8;border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--rust)}
 
-/* ── NO CONTENT WARNING ── */
-.no-content{
-  background:var(--rust-lt);border:1px solid #e8c8b8;
-  border-radius:var(--r);padding:16px 20px;
-  font-size:13px;color:var(--rust);
-}
-
-/* ── TOPIC INPUT ── */
-.topic-row{
-  display:flex;gap:10px;
-}
+/* Topic input */
+.topic-row{display:flex;gap:10px;flex-wrap:wrap}
 .topic-input{
-  flex:1;padding:10px 14px;border-radius:10px;
-  border:1px solid var(--border);
-  font-family:var(--sans);font-size:14px;color:var(--ink);
+  flex:1;min-width:200px;padding:10px 14px;border-radius:10px;
+  border:1px solid var(--border);font-family:var(--sans);font-size:14px;color:var(--ink);
   background:#fff;outline:none;
 }
 .topic-input:focus{border-color:var(--rust)}
 
-/* ── CONTENT SOURCE TOGGLE ── */
-.source-toggle{
-  display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;
-  background:var(--cream);align-self:flex-start;
-}
-.src-btn{
-  padding:7px 16px;border:none;background:transparent;
-  font-family:var(--sans);font-size:12px;font-weight:500;
-  color:var(--muted);cursor:pointer;transition:all 0.15s;
-}
+/* Source toggle */
+.source-toggle{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--cream);align-self:flex-start}
+.src-btn{padding:7px 16px;border:none;background:transparent;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all 0.15s}
 .src-btn.active{background:var(--ink);color:var(--paper)}
 
-.result-body h1,.result-body h2,.result-body h3{font-family:var(--serif);margin:12px 0 6px;color:var(--ink)}
-.result-body h1{font-size:20px}.result-body h2{font-size:17px}.result-body h3{font-size:15px}
-.result-body strong{font-weight:600;color:var(--ink)}
-.result-body ul,.result-body ol{padding-left:20px;margin:6px 0}
-.result-body li{margin:4px 0;line-height:1.6}
-.result-body p{margin:6px 0;line-height:1.75}
-.result-body code{font-family:var(--mono);font-size:12px;background:var(--warm);padding:1px 5px;border-radius:4px}
-.result-body pre{background:var(--warm);border-radius:8px;padding:12px;overflow-x:auto;margin:8px 0}
-.result-body pre code{background:none;padding:0}
+/* ══════════════════════════════════════════
+   BOTTOM NAV (mobile only)
+══════════════════════════════════════════ */
+.bottom-nav{
+  display:none;
+  position:fixed;
+  bottom:0;left:0;right:0;
+  height:var(--bottom-nav-h);
+  background:var(--ink);
+  border-top:1px solid rgba(255,255,255,0.1);
+  z-index:100;
+  padding:0 8px;
+}
+.bottom-nav-inner{
+  display:flex;
+  height:100%;
+  align-items:stretch;
+}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;border:none;background:transparent;
+  color:#9a9082;font-family:var(--sans);font-size:10px;font-weight:500;
+  cursor:pointer;transition:color 0.15s;padding:8px 4px;
+  border-radius:8px;margin:6px 2px;
+}
+.bnav-btn.active{color:var(--rust);background:rgba(196,92,42,0.12)}
+.bnav-btn:hover{color:var(--paper)}
+.bnav-icon{font-size:18px;line-height:1}
 
+/* ══════════════════════════════════════════
+   TABLET (≤ 900px): collapse sidebar to overlay
+══════════════════════════════════════════ */
+@media (max-width:900px){
+  :root{--sidebar-w:280px}
+
+  .header-sub{display:none}
+  .model-pill{display:none}
+  .menu-btn{display:block;margin-left:auto}
+
+  aside{
+    position:fixed;
+    top:var(--header-h);
+    left:0;
+    bottom:0;
+    transform:translateX(-100%);
+    box-shadow:4px 0 24px rgba(0,0,0,0.15);
+  }
+  aside.open{transform:translateX(0)}
+  .sidebar-overlay{display:block;opacity:0;pointer-events:none;transition:opacity 0.3s}
+  .sidebar-overlay.open{opacity:1;pointer-events:auto}
+
+  .content-area{padding:20px 20px 100px}
+}
+
+/* ══════════════════════════════════════════
+   MOBILE (≤ 600px): bottom nav, tighter layout
+══════════════════════════════════════════ */
+@media (max-width:600px){
+  :root{--header-h:52px}
+
+  header{padding:0 14px;gap:10px}
+  header h1{font-size:15px}
+  .logo-mark{width:28px;height:28px;font-size:14px}
+
+  .content-area{padding:16px 14px 80px;gap:14px}
+
+  .panel-head h2{font-size:20px}
+
+  .btn{padding:10px 18px;font-size:13px;width:100%}
+  .controls-row{flex-direction:column;align-items:stretch}
+  .controls-row .count-select{width:100%}
+  .controls-row label{margin-bottom:-4px}
+
+  .topic-row{flex-direction:column}
+  .topic-input{min-width:0;width:100%}
+
+  .source-toggle{align-self:stretch}
+  .src-btn{flex:1;text-align:center}
+
+  .fc-grid{grid-template-columns:1fr;padding:14px}
+
+  .result-body{padding:14px;font-size:13px}
+
+  .bottom-nav{display:flex}
+
+  /* hide sidebar hamburger on very small — use bottom nav instead */
+  .menu-btn{display:none}
+  aside{top:var(--header-h);bottom:var(--bottom-nav-h)}
+  .sidebar-overlay{bottom:var(--bottom-nav-h)}
+
+  /* upload button on mobile */
+  .upload-btn-mobile{
+    display:flex;
+    align-items:center;gap:8px;
+    background:var(--rust);color:#fff;
+    border:none;border-radius:10px;padding:10px 16px;
+    font-family:var(--sans);font-size:13px;font-weight:600;
+    cursor:pointer;width:100%;justify-content:center;
+    margin-bottom:4px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   LARGE SCREEN (≥ 1200px)
+══════════════════════════════════════════ */
+@media (min-width:1200px){
+  .header-sub{display:inline}
+  .content-area{padding:32px 40px;max-width:900px}
+  main{justify-content:flex-start}
+}
+
+/* ══════════════════════════════════════════
+   UPLOAD PANEL (mobile sheet)
+══════════════════════════════════════════ */
+.upload-sheet{
+  display:none;position:fixed;
+  bottom:var(--bottom-nav-h);left:0;right:0;
+  background:var(--cream);border-top:1px solid var(--border);
+  padding:20px 16px;z-index:80;
+  border-radius:16px 16px 0 0;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.12);
+  transform:translateY(100%);
+  transition:transform 0.3s ease;
+}
+.upload-sheet.open{transform:translateY(0);display:block}
+.upload-sheet-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px}
+.upload-sheet h3{font-family:var(--serif);font-size:16px;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -325,13 +433,18 @@ label.count-label{font-size:13px;color:var(--muted)}
   <div class="logo-mark">S</div>
   <h1>Study AI</h1>
   <span class="header-sub">— Intelligent Study Partner</span>
-  <span class="ollama-pill">llama3.2 · local</span>
+  <span class="model-pill">llama3.3 · groq</span>
+  <!-- hamburger (tablet) -->
+  <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
 </header>
+
+<!-- Sidebar overlay (tablet/mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <main>
 
 <!-- ── SIDEBAR ── -->
-<aside>
+<aside id="sidebar">
   <p class="section-label">Tools</p>
   <button class="nav-btn active" onclick="switchPanel('summarize',this)">
     <span class="ni">📋</span> Summarize
@@ -348,8 +461,8 @@ label.count-label{font-size:13px;color:var(--muted)}
 
   <p class="section-label" style="margin-top:16px">Your Document</p>
 
-  <!-- Upload zone -->
-  <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
+  <div class="upload-zone" id="uploadZone"
+       onclick="document.getElementById('fileInput').click()"
        ondragover="event.preventDefault();this.classList.add('drag')"
        ondragleave="this.classList.remove('drag')"
        ondrop="handleDrop(event)">
@@ -359,7 +472,6 @@ label.count-label{font-size:13px;color:var(--muted)}
     <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.md" onchange="handleFileSelect(this)"/>
   </div>
 
-  <!-- Loaded document info -->
   <div id="docCard" style="display:none" class="doc-card">
     <div class="doc-name" id="docName">—</div>
     <div class="doc-meta" id="docMeta">—</div>
@@ -367,7 +479,7 @@ label.count-label{font-size:13px;color:var(--muted)}
   </div>
 
   <div class="sidebar-bottom">
-    <p>All processing happens locally via <strong>Ollama</strong>. Your notes never leave your machine.</p>
+    <p>Powered by <strong>Groq</strong> (LLaMA 3.3). Your notes are processed securely and never stored.</p>
   </div>
 </aside>
 
@@ -380,6 +492,11 @@ label.count-label{font-size:13px;color:var(--muted)}
       <h2>Summarize Notes</h2>
       <p>Upload your notes or paste text — get a clean, structured summary with key points.</p>
     </div>
+
+    <!-- Mobile upload button (shown inside panel on small screens) -->
+    <button class="upload-btn-mobile" onclick="document.getElementById('fileInput').click()" style="display:none" id="mobileUploadBtn">
+      📄 Upload Document
+    </button>
 
     <div class="source-toggle">
       <button class="src-btn active" id="src-sum-doc" onclick="setSource('sum','doc',this)">From Document</button>
@@ -468,7 +585,7 @@ label.count-label{font-size:13px;color:var(--muted)}
 
     <div class="topic-row">
       <input class="topic-input" id="topic-input" type="text"
-             placeholder="e.g. Photosynthesis, The French Revolution, Newton's Laws..."
+             placeholder="e.g. Photosynthesis, French Revolution, Newton's Laws..."
              onkeydown="if(event.key==='Enter') doExplain()"/>
       <button class="btn btn-primary" id="e-btn" onclick="doExplain()">Explain →</button>
     </div>
@@ -526,18 +643,79 @@ label.count-label{font-size:13px;color:var(--muted)}
 </div><!-- /content-area -->
 </main>
 
+<!-- ══════════════════════════════════════════
+     BOTTOM NAV (mobile)
+══════════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn active" id="bnav-summarize" onclick="switchPanel('summarize', null, 'summarize')">
+      <span class="bnav-icon">📋</span>
+      Summarize
+    </button>
+    <button class="bnav-btn" id="bnav-questions" onclick="switchPanel('questions', null, 'questions')">
+      <span class="bnav-icon">❓</span>
+      Quiz
+    </button>
+    <button class="bnav-btn" id="bnav-explain" onclick="switchPanel('explain', null, 'explain')">
+      <span class="bnav-icon">💡</span>
+      Explain
+    </button>
+    <button class="bnav-btn" id="bnav-flashcards" onclick="switchPanel('flashcards', null, 'flashcards')">
+      <span class="bnav-icon">🃏</span>
+      Cards
+    </button>
+    <button class="bnav-btn" id="bnav-upload" onclick="document.getElementById('fileInput').click()">
+      <span class="bnav-icon">📄</span>
+      Upload
+    </button>
+  </div>
+</nav>
+
 <script>
 const API = 'https://study-assistant-ai-oinh.onrender.com/api/study';
-let docContent = null;       // extracted text from uploaded file
+let docContent = null;
 let docFilename = null;
 const sources = {sum:'doc', q:'doc', e:'doc', f:'doc'};
 
+// ── RESPONSIVE HELPERS ────────────────────────────────────────────────────
+function isMobile(){ return window.innerWidth <= 600; }
+function isTablet(){ return window.innerWidth <= 900; }
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
 // ── PANEL SWITCHING ───────────────────────────────────────────────────────
-function switchPanel(id, btn) {
+function switchPanel(id, btn, bnavId) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+
   document.getElementById('panel-' + id).classList.add('active');
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
+
+  // sync bottom nav
+  const bId = bnavId || id;
+  const bnavEl = document.getElementById('bnav-' + bId);
+  if (bnavEl) bnavEl.classList.add('active');
+
+  // sync sidebar nav buttons
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) {
+      b.classList.add('active');
+    }
+  });
+
+  // close sidebar on mobile/tablet after selection
+  if (isTablet()) closeSidebar();
+
+  // scroll to top
+  document.querySelector('.content-area').scrollTop = 0;
 }
 
 // ── SOURCE TOGGLE ─────────────────────────────────────────────────────────
@@ -566,8 +744,8 @@ function getContent(panel) {
 function setLoading(btnId, outputId, loading, loadingMsg = 'Thinking') {
   const btn = document.getElementById(btnId);
   btn.disabled = loading;
-  btn.textContent = loading ? '...' : btn.dataset.originalText || btn.textContent;
   if (!btn.dataset.originalText) btn.dataset.originalText = btn.textContent;
+  btn.textContent = loading ? '...' : btn.dataset.originalText;
   if (loading) {
     document.getElementById(outputId).innerHTML =
       `<div class="loader"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span style="margin-left:4px">${loadingMsg}…</span></div>`;
@@ -579,6 +757,12 @@ function noContentWarning(outputId) {
   document.getElementById(outputId).innerHTML =
     '<div class="no-content">⚠️ Please upload a document or paste text first.</div>';
   document.getElementById(outputId).classList.remove('empty');
+}
+
+function restoreBtn(id, label) {
+  const btn = document.getElementById(id);
+  btn.disabled = false;
+  btn.textContent = label;
 }
 
 // ── FILE UPLOAD ───────────────────────────────────────────────────────────
@@ -620,34 +804,43 @@ async function uploadFile(file) {
     document.getElementById('docMeta').textContent =
       `${data.wordCount.toLocaleString()} words · ${(data.characters/1000).toFixed(1)}k chars`;
 
+    // update bottom nav upload button to show doc loaded
+    const bnavUpload = document.getElementById('bnav-upload');
+    if (bnavUpload) {
+      bnavUpload.innerHTML = '<span class="bnav-icon">✅</span><span style="font-size:9px">Loaded</span>';
+    }
+
   } catch (e) {
-    zone.innerHTML = `<span class="uz-icon">❌</span><p style="color:var(--rust)">Upload failed. Is Spring Boot running?</p>`;
-    setTimeout(resetUploadZone, 3000);
+    zone.innerHTML = `<span class="uz-icon">❌</span><p style="color:var(--rust)">Upload failed. Server may be waking up — try again.</p>`;
+    setTimeout(resetUploadZone, 4000);
   }
 }
 
 function resetUploadZone() {
-  document.getElementById('uploadZone').innerHTML = `
+  const zone = document.getElementById('uploadZone');
+  zone.style.display = '';
+  zone.innerHTML = `
     <span class="uz-icon">📄</span>
     <strong>Upload Notes</strong>
     <p style="margin-top:6px">PDF · DOCX · TXT<br/>Drag & drop or click</p>
     <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.md" onchange="handleFileSelect(this)"/>`;
-  document.getElementById('uploadZone').style.display = '';
 }
 
 function clearDocument() {
   docContent = null;
   docFilename = null;
   document.getElementById('docCard').style.display = 'none';
-  document.getElementById('uploadZone').style.display = '';
   resetUploadZone();
+  const bnavUpload = document.getElementById('bnav-upload');
+  if (bnavUpload) {
+    bnavUpload.innerHTML = '<span class="bnav-icon">📄</span>Upload';
+  }
 }
 
 // ── SUMMARIZE ─────────────────────────────────────────────────────────────
 async function doSummarize() {
   const content = getContent('sum');
   if (!content) return noContentWarning('sum-output');
-
   setLoading('sum-btn', 'sum-output', true, 'Summarizing');
   try {
     const r = await fetch(API + '/summarize', {
@@ -668,7 +861,6 @@ async function doQuestions() {
   const content = getContent('q');
   if (!content) return noContentWarning('q-output');
   const questionCount = parseInt(document.getElementById('q-count-select').value);
-
   setLoading('q-btn', 'q-output', true, 'Writing questions');
   try {
     const r = await fetch(API + '/questions', {
@@ -692,7 +884,6 @@ async function doExplain() {
     document.getElementById('e-output').textContent = 'Please enter a topic to explain.';
     return;
   }
-
   setLoading('e-btn', 'e-output', true, 'Explaining');
   try {
     const r = await fetch(API + '/explain', {
@@ -732,7 +923,7 @@ async function doFlashcards() {
 
     document.getElementById('f-time').textContent = d.durationMs + 'ms · ' + d.count + ' cards';
 
-    let html = '<div class="fc-controls"><span style="font-size:13px;color:var(--muted)">Click any card to reveal the answer</span></div><div class="fc-grid">';
+    let html = '<div class="fc-controls"><span style="font-size:13px;color:var(--muted)">Tap any card to reveal the answer</span></div><div class="fc-grid">';
     d.cards.forEach((card, i) => {
       html += `
         <div class="fc" onclick="this.classList.toggle('open')">
@@ -757,11 +948,9 @@ function escHtml(t) {
   return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function restoreBtn(id, label) {
-  const btn = document.getElementById(id);
-  btn.disabled = false;
-  btn.textContent = label;
-}
+// ── INIT ──────────────────────────────────────────────────────────────────
+// Close sidebar on escape key
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSidebar(); });
 </script>
 </body>
 </html>
