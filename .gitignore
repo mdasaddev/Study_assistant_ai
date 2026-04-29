@@ -1,0 +1,28 @@
+# Maven build output
+target/
+
+# Logs
+*.log
+
+# Compiled class files
+*.class
+
+# IDE files (Eclipse / STS)
+.settings/
+.project
+.classpath
+.factorypath
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env

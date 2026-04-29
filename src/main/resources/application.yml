@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: ai-study-assistant
+
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: llama3.2
+          temperature: 0.6
+          num-predict: 3000    # Increased for detailed summaries of long PDFs
+          num-ctx: 8192        # Context window — how much of the PDF the model sees
+
+  servlet:
+    multipart:
+      max-file-size: 20MB      # Allow large PDF uploads
+      max-request-size: 20MB
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.study: INFO
+    org.springframework.ai: DEBUG

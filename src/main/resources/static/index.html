@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Study AI — Your Intelligent Study Partner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:#1a1612;
+  --paper:#faf7f2;
+  --cream:#f2ede4;
+  --warm:#e8dfd0;
+  --rust:#c45c2a;
+  --rust-lt:#f0e8e0;
+  --sage:#4a6741;
+  --sage-lt:#e8f0e6;
+  --gold:#b08d3a;
+  --gold-lt:#f5efd8;
+  --blue:#2c5f8a;
+  --blue-lt:#e2edf7;
+  --muted:#7a6f64;
+  --border:#d8d0c4;
+  --serif:'Lora',Georgia,serif;
+  --sans:'Plus Jakarta Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --r:12px;
+  --shadow:0 2px 16px rgba(26,22,18,0.08);
+}
+
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── HEADER ── */
+header{
+  background:var(--ink);
+  color:var(--paper);
+  padding:0 32px;
+  height:60px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.logo-mark{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--rust);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:16px;font-style:italic;color:#fff;
+}
+header h1{font-family:var(--serif);font-size:17px;font-weight:400;letter-spacing:0.02em}
+.header-sub{font-size:12px;color:#9a9082;margin-left:4px}
+.ollama-pill{
+  margin-left:auto;font-size:11px;font-family:var(--mono);
+  padding:4px 10px;border-radius:20px;
+  background:rgba(255,255,255,0.08);color:#b0a898;
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+/* ── LAYOUT ── */
+main{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+aside{
+  width:260px;min-width:260px;
+  background:var(--cream);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:20px 16px;
+  gap:6px;
+  overflow-y:auto;
+}
+
+.section-label{
+  font-size:10px;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--muted);padding:0 8px 4px;margin-top:8px;
+}
+
+.nav-btn{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:var(--r);
+  border:none;background:transparent;
+  color:var(--muted);font-family:var(--sans);
+  font-size:13px;font-weight:500;cursor:pointer;
+  width:100%;text-align:left;transition:all 0.15s;
+}
+.nav-btn:hover{background:var(--warm);color:var(--ink)}
+.nav-btn.active{
+  background:var(--ink);color:var(--paper);
+}
+.nav-btn .ni{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;background:rgba(255,255,255,0.1);
+  flex-shrink:0;
+}
+.nav-btn:not(.active) .ni{background:var(--warm)}
+
+/* Upload area in sidebar */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:var(--r);
+  padding:20px;text-align:center;cursor:pointer;
+  transition:all 0.2s;margin-top:4px;
+}
+.upload-zone:hover,.upload-zone.drag{
+  border-color:var(--rust);background:var(--rust-lt);
+}
+.upload-zone .uz-icon{font-size:28px;display:block;margin-bottom:8px}
+.upload-zone p{font-size:12px;color:var(--muted);line-height:1.5}
+.upload-zone strong{font-size:13px;color:var(--rust);font-weight:600}
+input[type=file]{display:none}
+
+.doc-card{
+  background:var(--warm);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px;margin-top:4px;
+}
+.doc-card .doc-name{font-size:13px;font-weight:600;color:var(--ink);word-break:break-all}
+.doc-card .doc-meta{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+.doc-card .remove-btn{
+  font-size:11px;color:var(--rust);border:none;background:none;
+  cursor:pointer;margin-top:6px;padding:0;font-family:var(--sans);
+}
+
+.sidebar-bottom{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
+.sidebar-bottom p{font-size:11px;color:var(--muted);line-height:1.5;padding:0 4px}
+
+/* ── CONTENT ── */
+.content-area{
+  flex:1;overflow-y:auto;
+  display:flex;flex-direction:column;
+  padding:28px 32px;gap:20px;
+}
+
+.panel{display:none;flex-direction:column;gap:20px}
+.panel.active{display:flex}
+
+/* ── PANEL HEADER ── */
+.panel-head{}
+.panel-head h2{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink)}
+.panel-head p{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.5}
+
+/* ── INPUT CARD ── */
+.input-card{
+  background:#fff;border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.card-label{
+  padding:10px 16px 0;
+  font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);
+}
+textarea{
+  width:100%;padding:10px 16px 12px;
+  border:none;outline:none;resize:vertical;
+  background:transparent;color:var(--ink);
+  font-family:var(--sans);font-size:14px;line-height:1.6;
+  min-height:90px;
+}
+.card-footer{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 16px;border-top:1px solid var(--border);
+  background:var(--cream);
+}
+.char-count{font-size:11px;color:var(--muted);font-family:var(--mono)}
+
+/* Controls row */
+.controls-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.count-select{
+  padding:6px 10px;border-radius:8px;border:1px solid var(--border);
+  background:#fff;color:var(--ink);font-family:var(--sans);font-size:13px;
+  cursor:pointer;
+}
+label.count-label{font-size:13px;color:var(--muted)}
+
+/* Buttons */
+.btn{
+  padding:9px 22px;border-radius:10px;border:none;
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.15s;
+}
+.btn-primary{background:var(--rust);color:#fff}
+.btn-primary:hover{background:#b05225}
+.btn-primary:disabled{opacity:0.45;cursor:not-allowed}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-outline{
+  background:transparent;border:1px solid var(--border);
+  color:var(--muted);
+}
+.btn-outline:hover{border-color:var(--ink);color:var(--ink)}
+
+.ml-auto{margin-left:auto}
+
+/* ── RESULT CARD ── */
+.result-card{
+  background:#fff;border:1px solid var(--border);
+  border-radius:var(--r);box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.result-header{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  background:var(--cream);
+}
+.type-pill{
+  font-size:10px;font-family:var(--mono);font-weight:500;
+  padding:3px 10px;border-radius:20px;
+}
+.pill-summary{background:var(--sage-lt);color:var(--sage);border:1px solid #c4d8c0}
+.pill-questions{background:var(--blue-lt);color:var(--blue);border:1px solid #b8d0e8}
+.pill-explain{background:var(--gold-lt);color:var(--gold);border:1px solid #e0d0a0}
+.pill-flash{background:var(--rust-lt);color:var(--rust);border:1px solid #e8c8b8}
+
+.result-meta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-left:auto}
+
+.result-body{
+  padding:20px;font-size:14px;line-height:1.75;
+  color:var(--ink);min-height:120px;
+}
+.result-body p{margin-bottom:10px}
+.result-body strong,.result-body b{font-weight:600;color:var(--ink)}
+.result-body ul,.result-body ol{padding-left:22px;margin-bottom:10px}
+.result-body li{margin-bottom:4px}
+.result-body h1,.result-body h2,.result-body h3{
+  font-family:var(--serif);font-weight:600;margin:14px 0 6px;color:var(--ink)
+}
+.result-body.empty{
+  display:flex;align-items:center;justify-content:center;
+  min-height:160px;color:var(--muted);font-style:italic;font-size:13px;
+}
+
+/* ── LOADING ── */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.loader{
+  display:flex;align-items:center;gap:6px;
+  padding:20px;color:var(--muted);font-size:13px;
+}
+.dot{
+  width:7px;height:7px;border-radius:50%;background:var(--rust);
+  animation:blink 1.2s ease-in-out infinite;
+}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+
+/* ── FLASHCARDS ── */
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:20px}
+.fc{
+  border:1px solid var(--border);border-radius:var(--r);
+  overflow:hidden;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;
+}
+.fc:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.fc-front{
+  padding:16px;background:var(--cream);
+  font-weight:600;font-size:14px;line-height:1.4;color:var(--ink);
+}
+.fc-back{
+  padding:14px 16px;background:#fff;
+  font-size:13px;line-height:1.6;color:var(--muted);
+  border-top:1px solid var(--border);
+  display:none;
+}
+.fc.open .fc-back{display:block}
+.fc.open .fc-front{color:var(--rust)}
+.fc-hint{font-size:10px;color:var(--rust);margin-top:8px;font-family:var(--mono)}
+
+.fc-controls{
+  display:flex;align-items:center;gap:10px;
+  padding:0 20px 16px;
+}
+
+/* ── NO CONTENT WARNING ── */
+.no-content{
+  background:var(--rust-lt);border:1px solid #e8c8b8;
+  border-radius:var(--r);padding:16px 20px;
+  font-size:13px;color:var(--rust);
+}
+
+/* ── TOPIC INPUT ── */
+.topic-row{
+  display:flex;gap:10px;
+}
+.topic-input{
+  flex:1;padding:10px 14px;border-radius:10px;
+  border:1px solid var(--border);
+  font-family:var(--sans);font-size:14px;color:var(--ink);
+  background:#fff;outline:none;
+}
+.topic-input:focus{border-color:var(--rust)}
+
+/* ── CONTENT SOURCE TOGGLE ── */
+.source-toggle{
+  display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  background:var(--cream);align-self:flex-start;
+}
+.src-btn{
+  padding:7px 16px;border:none;background:transparent;
+  font-family:var(--sans);font-size:12px;font-weight:500;
+  color:var(--muted);cursor:pointer;transition:all 0.15s;
+}
+.src-btn.active{background:var(--ink);color:var(--paper)}
+
+.result-body h1,.result-body h2,.result-body h3{font-family:var(--serif);margin:12px 0 6px;color:var(--ink)}
+.result-body h1{font-size:20px}.result-body h2{font-size:17px}.result-body h3{font-size:15px}
+.result-body strong{font-weight:600;color:var(--ink)}
+.result-body ul,.result-body ol{padding-left:20px;margin:6px 0}
+.result-body li{margin:4px 0;line-height:1.6}
+.result-body p{margin:6px 0;line-height:1.75}
+.result-body code{font-family:var(--mono);font-size:12px;background:var(--warm);padding:1px 5px;border-radius:4px}
+.result-body pre{background:var(--warm);border-radius:8px;padding:12px;overflow-x:auto;margin:8px 0}
+.result-body pre code{background:none;padding:0}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">S</div>
+  <h1>Study AI</h1>
+  <span class="header-sub">— Intelligent Study Partner</span>
+  <span class="ollama-pill">llama3.2 · local</span>
+</header>
+
+<main>
+
+<!-- ── SIDEBAR ── -->
+<aside>
+  <p class="section-label">Tools</p>
+  <button class="nav-btn active" onclick="switchPanel('summarize',this)">
+    <span class="ni">📋</span> Summarize
+  </button>
+  <button class="nav-btn" onclick="switchPanel('questions',this)">
+    <span class="ni">❓</span> Practice Questions
+  </button>
+  <button class="nav-btn" onclick="switchPanel('explain',this)">
+    <span class="ni">💡</span> Explain Topic
+  </button>
+  <button class="nav-btn" onclick="switchPanel('flashcards',this)">
+    <span class="ni">🃏</span> Flashcards
+  </button>
+
+  <p class="section-label" style="margin-top:16px">Your Document</p>
+
+  <!-- Upload zone -->
+  <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
+       ondragover="event.preventDefault();this.classList.add('drag')"
+       ondragleave="this.classList.remove('drag')"
+       ondrop="handleDrop(event)">
+    <span class="uz-icon">📄</span>
+    <strong>Upload Notes</strong>
+    <p style="margin-top:6px">PDF · DOCX · TXT<br/>Drag & drop or click</p>
+    <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.md" onchange="handleFileSelect(this)"/>
+  </div>
+
+  <!-- Loaded document info -->
+  <div id="docCard" style="display:none" class="doc-card">
+    <div class="doc-name" id="docName">—</div>
+    <div class="doc-meta" id="docMeta">—</div>
+    <button class="remove-btn" onclick="clearDocument()">✕ Remove document</button>
+  </div>
+
+  <div class="sidebar-bottom">
+    <p>All processing happens locally via <strong>Ollama</strong>. Your notes never leave your machine.</p>
+  </div>
+</aside>
+
+<!-- ── CONTENT ── -->
+<div class="content-area">
+
+  <!-- ════ SUMMARIZE ════ -->
+  <div id="panel-summarize" class="panel active">
+    <div class="panel-head">
+      <h2>Summarize Notes</h2>
+      <p>Upload your notes or paste text — get a clean, structured summary with key points.</p>
+    </div>
+
+    <div class="source-toggle">
+      <button class="src-btn active" id="src-sum-doc" onclick="setSource('sum','doc',this)">From Document</button>
+      <button class="src-btn" id="src-sum-text" onclick="setSource('sum','text',this)">Paste Text</button>
+    </div>
+
+    <div id="sum-text-area" style="display:none" class="input-card">
+      <div class="card-label">Paste your notes</div>
+      <textarea id="sum-input" placeholder="Paste your study notes here..." rows="5"
+                oninput="updateCount('sum-input','sum-count')"></textarea>
+      <div class="card-footer">
+        <span class="char-count" id="sum-count">0 chars</span>
+      </div>
+    </div>
+
+    <div>
+      <button class="btn btn-primary" id="sum-btn" onclick="doSummarize()">Generate Summary →</button>
+    </div>
+
+    <div class="result-card" id="sum-result">
+      <div class="result-header">
+        <span class="type-pill pill-summary">SUMMARY</span>
+        <span class="result-meta" id="sum-time"></span>
+      </div>
+      <div class="result-body empty" id="sum-output">Upload a document or paste text to get started</div>
+    </div>
+  </div>
+
+  <!-- ════ QUESTIONS ════ -->
+  <div id="panel-questions" class="panel">
+    <div class="panel-head">
+      <h2>Practice Questions</h2>
+      <p>Generate a quiz with mixed question types — multiple choice, short answer, and true/false.</p>
+    </div>
+
+    <div class="source-toggle">
+      <button class="src-btn active" id="src-q-doc" onclick="setSource('q','doc',this)">From Document</button>
+      <button class="src-btn" id="src-q-text" onclick="setSource('q','text',this)">Paste Text</button>
+    </div>
+
+    <div id="q-text-area" style="display:none" class="input-card">
+      <div class="card-label">Paste your notes</div>
+      <textarea id="q-input" placeholder="Paste study material here..." rows="5"
+                oninput="updateCount('q-input','q-count')"></textarea>
+      <div class="card-footer"><span class="char-count" id="q-count">0 chars</span></div>
+    </div>
+
+    <div class="controls-row">
+      <label class="count-label">Number of questions:</label>
+      <select class="count-select" id="q-count-select">
+        <option value="3">3 questions</option>
+        <option value="5" selected>5 questions</option>
+        <option value="8">8 questions</option>
+        <option value="10">10 questions</option>
+      </select>
+      <button class="btn btn-primary" id="q-btn" onclick="doQuestions()">Generate Quiz →</button>
+    </div>
+
+    <div class="result-card" id="q-result">
+      <div class="result-header">
+        <span class="type-pill pill-questions">PRACTICE QUIZ</span>
+        <span class="result-meta" id="q-time"></span>
+      </div>
+      <div class="result-body empty" id="q-output">Your practice questions will appear here</div>
+    </div>
+  </div>
+
+  <!-- ════ EXPLAIN ════ -->
+  <div id="panel-explain" class="panel">
+    <div class="panel-head">
+      <h2>Explain a Topic</h2>
+      <p>Enter any topic from your notes — get a structured explanation with examples and analogies.</p>
+    </div>
+
+    <div class="source-toggle">
+      <button class="src-btn active" id="src-e-doc" onclick="setSource('e','doc',this)">From Document</button>
+      <button class="src-btn" id="src-e-text" onclick="setSource('e','text',this)">Paste Text</button>
+    </div>
+
+    <div id="e-text-area" style="display:none" class="input-card">
+      <div class="card-label">Paste your notes (used as context)</div>
+      <textarea id="e-input" placeholder="Paste study material here..." rows="4"
+                oninput="updateCount('e-input','e-count')"></textarea>
+      <div class="card-footer"><span class="char-count" id="e-count">0 chars</span></div>
+    </div>
+
+    <div class="topic-row">
+      <input class="topic-input" id="topic-input" type="text"
+             placeholder="e.g. Photosynthesis, The French Revolution, Newton's Laws..."
+             onkeydown="if(event.key==='Enter') doExplain()"/>
+      <button class="btn btn-primary" id="e-btn" onclick="doExplain()">Explain →</button>
+    </div>
+
+    <div class="result-card" id="e-result">
+      <div class="result-header">
+        <span class="type-pill pill-explain">EXPLANATION</span>
+        <span class="result-meta" id="e-time"></span>
+      </div>
+      <div class="result-body empty" id="e-output">Enter a topic above to get a detailed explanation</div>
+    </div>
+  </div>
+
+  <!-- ════ FLASHCARDS ════ -->
+  <div id="panel-flashcards" class="panel">
+    <div class="panel-head">
+      <h2>Flashcards</h2>
+      <p>Generate interactive flashcards for active recall. Click a card to reveal the answer.</p>
+    </div>
+
+    <div class="source-toggle">
+      <button class="src-btn active" id="src-f-doc" onclick="setSource('f','doc',this)">From Document</button>
+      <button class="src-btn" id="src-f-text" onclick="setSource('f','text',this)">Paste Text</button>
+    </div>
+
+    <div id="f-text-area" style="display:none" class="input-card">
+      <div class="card-label">Paste your notes</div>
+      <textarea id="f-input" placeholder="Paste study material here..." rows="4"
+                oninput="updateCount('f-input','f-count')"></textarea>
+      <div class="card-footer"><span class="char-count" id="f-count">0 chars</span></div>
+    </div>
+
+    <div class="controls-row">
+      <label class="count-label">Number of flashcards:</label>
+      <select class="count-select" id="f-count-select">
+        <option value="4">4 cards</option>
+        <option value="6" selected>6 cards</option>
+        <option value="8">8 cards</option>
+        <option value="12">12 cards</option>
+      </select>
+      <button class="btn btn-primary" id="f-btn" onclick="doFlashcards()">Generate Cards →</button>
+    </div>
+
+    <div class="result-card" id="f-result">
+      <div class="result-header">
+        <span class="type-pill pill-flash">FLASHCARDS</span>
+        <span class="result-meta" id="f-time"></span>
+      </div>
+      <div id="f-output" style="padding:20px;color:var(--muted);font-style:italic;font-size:13px">
+        Your flashcards will appear here. Click any card to reveal the answer.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content-area -->
+</main>
+
+<script>
+const API = 'http://localhost:8080/api/study';
+let docContent = null;       // extracted text from uploaded file
+let docFilename = null;
+const sources = {sum:'doc', q:'doc', e:'doc', f:'doc'};
+
+// ── PANEL SWITCHING ───────────────────────────────────────────────────────
+function switchPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── SOURCE TOGGLE ─────────────────────────────────────────────────────────
+function setSource(panel, src, btn) {
+  sources[panel] = src;
+  const areaMap = {sum:'sum-text-area', q:'q-text-area', e:'e-text-area', f:'f-text-area'};
+  const docBtn  = document.getElementById('src-' + panel + '-doc');
+  const textBtn = document.getElementById('src-' + panel + '-text');
+  docBtn.classList.toggle('active', src === 'doc');
+  textBtn.classList.toggle('active', src === 'text');
+  document.getElementById(areaMap[panel]).style.display = src === 'text' ? 'block' : 'none';
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+function updateCount(id, countId) {
+  const v = document.getElementById(id).value.length;
+  document.getElementById(countId).textContent = v.toLocaleString() + ' chars';
+}
+
+function getContent(panel) {
+  if (sources[panel] === 'doc') return docContent;
+  const ids = {sum:'sum-input', q:'q-input', e:'e-input', f:'f-input'};
+  return document.getElementById(ids[panel]).value.trim() || null;
+}
+
+function setLoading(btnId, outputId, loading, loadingMsg = 'Thinking') {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.textContent = loading ? '...' : btn.dataset.originalText || btn.textContent;
+  if (!btn.dataset.originalText) btn.dataset.originalText = btn.textContent;
+  if (loading) {
+    document.getElementById(outputId).innerHTML =
+      `<div class="loader"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span style="margin-left:4px">${loadingMsg}…</span></div>`;
+    document.getElementById(outputId).classList.remove('empty');
+  }
+}
+
+function noContentWarning(outputId) {
+  document.getElementById(outputId).innerHTML =
+    '<div class="no-content">⚠️ Please upload a document or paste text first.</div>';
+  document.getElementById(outputId).classList.remove('empty');
+}
+
+// ── FILE UPLOAD ───────────────────────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f) uploadFile(f);
+}
+
+function handleFileSelect(input) {
+  if (input.files[0]) uploadFile(input.files[0]);
+}
+
+async function uploadFile(file) {
+  const zone = document.getElementById('uploadZone');
+  zone.innerHTML = '<span class="uz-icon">⏳</span><p>Extracting text...</p>';
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await fetch(API + '/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+
+    if (data.error) {
+      zone.innerHTML = `<span class="uz-icon">❌</span><p style="color:var(--rust)">${data.error}</p>`;
+      setTimeout(resetUploadZone, 3000);
+      return;
+    }
+
+    docContent = data.content;
+    docFilename = data.filename;
+
+    zone.style.display = 'none';
+    const card = document.getElementById('docCard');
+    card.style.display = 'block';
+    document.getElementById('docName').textContent = data.filename;
+    document.getElementById('docMeta').textContent =
+      `${data.wordCount.toLocaleString()} words · ${(data.characters/1000).toFixed(1)}k chars`;
+
+  } catch (e) {
+    zone.innerHTML = `<span class="uz-icon">❌</span><p style="color:var(--rust)">Upload failed. Is Spring Boot running?</p>`;
+    setTimeout(resetUploadZone, 3000);
+  }
+}
+
+function resetUploadZone() {
+  document.getElementById('uploadZone').innerHTML = `
+    <span class="uz-icon">📄</span>
+    <strong>Upload Notes</strong>
+    <p style="margin-top:6px">PDF · DOCX · TXT<br/>Drag & drop or click</p>
+    <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.md" onchange="handleFileSelect(this)"/>`;
+  document.getElementById('uploadZone').style.display = '';
+}
+
+function clearDocument() {
+  docContent = null;
+  docFilename = null;
+  document.getElementById('docCard').style.display = 'none';
+  document.getElementById('uploadZone').style.display = '';
+  resetUploadZone();
+}
+
+// ── SUMMARIZE ─────────────────────────────────────────────────────────────
+async function doSummarize() {
+  const content = getContent('sum');
+  if (!content) return noContentWarning('sum-output');
+
+  setLoading('sum-btn', 'sum-output', true, 'Summarizing');
+  try {
+    const r = await fetch(API + '/summarize', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ content })
+    });
+    const d = await r.json();
+    document.getElementById('sum-output').innerHTML = marked.parse(d.result || '');
+    document.getElementById('sum-time').textContent = d.durationMs + 'ms';
+  } catch(e) {
+    document.getElementById('sum-output').textContent = 'Error: Could not connect to server.';
+  }
+  restoreBtn('sum-btn', 'Generate Summary →');
+}
+
+// ── QUESTIONS ─────────────────────────────────────────────────────────────
+async function doQuestions() {
+  const content = getContent('q');
+  if (!content) return noContentWarning('q-output');
+  const questionCount = parseInt(document.getElementById('q-count-select').value);
+
+  setLoading('q-btn', 'q-output', true, 'Writing questions');
+  try {
+    const r = await fetch(API + '/questions', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ content, questionCount })
+    });
+    const d = await r.json();
+    document.getElementById('q-output').innerHTML = marked.parse(d.result || '');
+    document.getElementById('q-time').textContent = d.durationMs + 'ms';
+  } catch(e) {
+    document.getElementById('q-output').textContent = 'Error: Could not connect to server.';
+  }
+  restoreBtn('q-btn', 'Generate Quiz →');
+}
+
+// ── EXPLAIN ───────────────────────────────────────────────────────────────
+async function doExplain() {
+  const content = getContent('e') || ' ';
+  const topic = document.getElementById('topic-input').value.trim();
+  if (!topic) {
+    document.getElementById('e-output').textContent = 'Please enter a topic to explain.';
+    return;
+  }
+
+  setLoading('e-btn', 'e-output', true, 'Explaining');
+  try {
+    const r = await fetch(API + '/explain', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ content, topic })
+    });
+    const d = await r.json();
+    document.getElementById('e-output').innerHTML = marked.parse(d.result || '');
+    document.getElementById('e-time').textContent = d.durationMs + 'ms';
+  } catch(e) {
+    document.getElementById('e-output').textContent = 'Error: Could not connect to server.';
+  }
+  restoreBtn('e-btn', 'Explain →');
+}
+
+// ── FLASHCARDS ────────────────────────────────────────────────────────────
+async function doFlashcards() {
+  const content = getContent('f');
+  if (!content) return noContentWarning('f-output');
+  const questionCount = parseInt(document.getElementById('f-count-select').value);
+
+  const out = document.getElementById('f-output');
+  out.innerHTML = '<div class="loader"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span style="margin-left:4px">Generating flashcards…</span></div>';
+  document.getElementById('f-btn').disabled = true;
+
+  try {
+    const r = await fetch(API + '/flashcards', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ content, questionCount })
+    });
+    const d = await r.json();
+
+    if (!d.success || !d.cards?.length) {
+      out.textContent = 'Failed to generate flashcards. Try again.';
+      return;
+    }
+
+    document.getElementById('f-time').textContent = d.durationMs + 'ms · ' + d.count + ' cards';
+
+    let html = '<div class="fc-controls"><span style="font-size:13px;color:var(--muted)">Click any card to reveal the answer</span></div><div class="fc-grid">';
+    d.cards.forEach((card, i) => {
+      html += `
+        <div class="fc" onclick="this.classList.toggle('open')">
+          <div class="fc-front">
+            <span style="font-size:10px;font-family:var(--mono);color:var(--muted)">CARD ${i+1}</span><br/>
+            ${escHtml(card.question)}
+            <div class="fc-hint">tap to reveal ↓</div>
+          </div>
+          <div class="fc-back">${escHtml(card.answer)}</div>
+        </div>`;
+    });
+    html += '</div>';
+    out.innerHTML = html;
+
+  } catch(e) {
+    out.textContent = 'Error: Could not connect to server.';
+  }
+  document.getElementById('f-btn').disabled = false;
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function restoreBtn(id, label) {
+  const btn = document.getElementById(id);
+  btn.disabled = false;
+  btn.textContent = label;
+}
+</script>
+</body>
+</html>
