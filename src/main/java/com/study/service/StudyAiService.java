@@ -14,15 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * StudyAiService — the brain of the Study Assistant.
- *
- * Four AI-powered operations:
- *  1. summarize()     — concise bullet-point summary
- *  2. generateQuestions() — practice questions from the content
- *  3. explainTopic()  — deep-dive explanation of a specific topic
- *  4. generateFlashcards() — Q&A flashcards for active recall
- */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -31,7 +23,7 @@ public class StudyAiService {
     private final ChatClient chatClient;
     private static final int MAX_CONTENT_CHARS = 12000;
 
-    // ─── Summarize ────────────────────────────────────────────────────────────
+
 
     private static final String SUMMARIZE_TEMPLATE = """
             You are an expert study coach creating a thorough summary for a student.
@@ -89,7 +81,7 @@ public class StudyAiService {
         }
     }
 
-    // ─── Practice Questions ───────────────────────────────────────────────────
+   
 
     private static final String QUESTIONS_TEMPLATE = """
             You are a professor creating a practice quiz. Generate {count} practice questions from the content below.
@@ -132,7 +124,7 @@ public class StudyAiService {
         }
     }
 
-    // ─── Explain Topic ────────────────────────────────────────────────────────
+    
 
     private static final String EXPLAIN_TEMPLATE = """
             You are a patient tutor. A student wants a detailed explanation of: "{topic}"
@@ -174,7 +166,7 @@ public class StudyAiService {
         }
     }
 
-    // ─── Flashcards ───────────────────────────────────────────────────────────
+    
 
     private static final String FLASHCARD_TEMPLATE = """
             You are creating flashcards for a student. Generate {count} flashcards from the study material.
@@ -217,9 +209,7 @@ public class StudyAiService {
         }
     }
 
-    /**
-     * Parse the structured CARD_START / CARD_END format from the AI response.
-     */
+   
     private List<Flashcard> parseFlashcards(String raw) {
         List<Flashcard> cards = new ArrayList<>();
         String[] blocks = raw.split("CARD_START");

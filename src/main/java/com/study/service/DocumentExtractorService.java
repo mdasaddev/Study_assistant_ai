@@ -12,22 +12,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * DocumentExtractorService — extracts plain text from uploaded files.
- *
- * Supports:
- *  - PDF (.pdf) via Apache PDFBox
- *  - Word documents (.docx) via Apache POI
- *  - Plain text (.txt, .md)
- */
+
 @Slf4j
 @Service
 public class DocumentExtractorService {
 
-    /**
-     * Extract all text from an uploaded file.
-     * Returns the raw text content ready for AI processing.
-     */
+   
     public String extractText(MultipartFile file) throws IOException {
         String filename = file.getOriginalFilename() != null
                 ? file.getOriginalFilename().toLowerCase()
@@ -63,10 +53,7 @@ public class DocumentExtractorService {
         }
     }
 
-    /**
-     * Truncate content to avoid overwhelming the LLM context window.
-     * Ollama's llama3.2 handles ~8k tokens — roughly 6000 words.
-     */
+  
     public String truncateIfNeeded(String text, int maxChars) {
         if (text.length() <= maxChars) return text;
 

@@ -13,16 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
-/**
- * StudyController — REST API for the AI Study Assistant.
- *
- * POST /api/study/upload       — Upload PDF/DOCX/TXT, get extracted text back
- * POST /api/study/summarize    — Summarize study content
- * POST /api/study/questions    — Generate practice questions
- * POST /api/study/explain      — Explain a specific topic from the content
- * POST /api/study/flashcards   — Generate flashcards (JSON array)
- * GET  /api/study/health       — Health check
- */
+
 @Slf4j
 @RestController
 @RequestMapping("/api/study")
@@ -33,11 +24,7 @@ public class StudyController {
     private final StudyAiService studyAiService;
     private final DocumentExtractorService extractorService;
 
-    /**
-     * Upload endpoint — extract text from PDF/DOCX/TXT files.
-     * Returns the extracted plain text so the frontend can cache it
-     * and send it to subsequent AI endpoints.
-     */
+  
     @PostMapping("/upload")
     public ResponseEntity<?> uploadDocument(@RequestParam("file") MultipartFile file) {
         try {
@@ -69,7 +56,7 @@ public class StudyController {
         }
     }
 
-    /** Summarize the uploaded study material */
+   
     @PostMapping("/summarize")
     public ResponseEntity<StudyResponse> summarize(@RequestBody StudyRequest request) {
         if (isBlank(request.getContent())) {
@@ -78,7 +65,7 @@ public class StudyController {
         return ResponseEntity.ok(studyAiService.summarize(request));
     }
 
-    /** Generate practice questions from the study material */
+   
     @PostMapping("/questions")
     public ResponseEntity<StudyResponse> generateQuestions(@RequestBody StudyRequest request) {
         if (isBlank(request.getContent())) {
@@ -87,7 +74,7 @@ public class StudyController {
         return ResponseEntity.ok(studyAiService.generateQuestions(request));
     }
 
-    /** Explain a specific topic using the study material as context */
+    
     @PostMapping("/explain")
     public ResponseEntity<StudyResponse> explainTopic(@RequestBody StudyRequest request) {
         if (isBlank(request.getContent())) {
@@ -99,7 +86,7 @@ public class StudyController {
         return ResponseEntity.ok(studyAiService.explainTopic(request));
     }
 
-    /** Generate flashcards (structured JSON) from the study material */
+  
     @PostMapping("/flashcards")
     public ResponseEntity<FlashcardResponse> generateFlashcards(@RequestBody StudyRequest request) {
         if (isBlank(request.getContent())) {
