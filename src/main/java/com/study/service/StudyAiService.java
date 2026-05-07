@@ -55,6 +55,7 @@ public class StudyAiService {
             - Never cut content short to save space
             - Use student-friendly language but preserve technical terms
             - If the content has 10 topics, cover all 10 — do not pick only a few
+            -If the content is short dont over expalin it 
             
             Study Material:
             {content}
